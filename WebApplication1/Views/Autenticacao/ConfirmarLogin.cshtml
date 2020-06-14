@@ -1,0 +1,62 @@
+﻿
+@{
+    ViewData["Title"] = "Confirmar Login";
+}
+
+<h2>Confirmar Login</h2>
+
+<script type="text/javascript">
+
+    const usuarioSolicitacao = @Html.Raw(ViewBag.UsuarioSolicitacao);
+
+    function enviarDados(event) {
+        event.preventDefault();
+
+        //let user = {
+        //    Username: document.getElementById('inpUsuario').value,
+        //    Email: document.getElementById('inpEmail').value
+        //}
+
+        let usuario = document.getElementById('inpUsuario').value;
+        let senha = document.getElementById('inpSenha').value;
+
+        fetch(`/Autenticacao/ConfirmarCriacao?usuarioSolicitacaoId=${usuarioSolicitacao.Id}&usuario=${usuario}&senha=${senha}`, null)
+            .then(function (res) {
+                console.log(`Sucesso: ${res}`);
+                debugger;
+
+                switch (res.status) {
+                    case 404:
+                        alert('Token expirado ou solicitação não encontrada');
+                        break;
+                    case 401:
+                        alert('Usuario/Senha não conferem com registro');
+                        break;
+                    default:
+                        alert('Sucesso');
+                        window.location = `/Autenticacao/NovaSenha?usuarioSolicitacaoId=${usuarioSolicitacao.Id}`
+                        break;
+                }
+            })
+            .catch(function (res) { console.log(`Erro: ${res}`); debugger; })
+    }
+</script>
+
+<section id="confirmarlogin">
+    <form onsubmit="enviarDados(event)" style="max-width: 35%">
+        <div class="form-group">
+            <label>Usuario</label>
+            <input type="text" id="inpUsuario" class="form-control" name="usuario" value="" />
+        </div>
+
+        <div class="form-group">
+            <label>Senha provisória</label>
+            <input type="password" id="inpSenha" class="form-control" name="senha" value="" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Confirmar</button>
+    </form>
+</section>
+
+
+

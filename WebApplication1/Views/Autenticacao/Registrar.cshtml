@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Registrar";
+}
+
+
+<h1>Registrar</h1>
+
+<script type="text/javascript">
+    function enviarDados(event) {
+        event.preventDefault();
+
+        //let user = {
+        //    Username: document.getElementById('inpUsuario').value,
+        //    Email: document.getElementById('inpEmail').value
+        //}
+
+        let usuario = document.getElementById('inpUsuario').value;
+        let email = document.getElementById('inpEmail').value;
+
+        fetch(`/Autenticacao/CriarUsuario?usuario=${usuario}&email=${email}`, null)
+            .then(function (res) { console.log(`Sucesso: ${res}`); alert('Sucesso\nVerifique seu e-mail.') })
+            .catch(function (res) { console.log(`Erro: ${res}`) })
+    }
+</script>
+
+<section id="registrar">
+    <form onsubmit="enviarDados(event)" style="max-width: 35%">
+        <div class="form-group">
+            <label>Usuario</label>
+            <input type="text" id="inpUsuario" class="form-control" name="usuario" value="" />
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="inpEmail" class="form-control" name="email" value="" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Registrar</button>
+    </form>
+</section>
+

@@ -1,0 +1,73 @@
+﻿
+@{
+    ViewData["Title"] = "Nova Senha";
+}
+
+<h2>Nova Senha</h2>
+
+<script type="text/javascript">
+
+    const usuarioSolicitacao = @Html.Raw(ViewBag.UsuarioSolicitacao);
+
+    function enviarDados(event) {
+        event.preventDefault();
+
+        let senha = document.getElementById('inpSenha').value;
+        let confirmarSenha = document.getElementById('inpConfirmarSenha').value;
+
+        let hasNumber = /\d/.test(senha);
+        let hasUpper = /[A-Z]/.test(senha);
+        let hasLower = /[a-z]/.test(senha);
+        let hasSpecial = /[!@@#$%¨&*()_=+]/.test(senha);
+        const valid = hasNumber && hasUpper && hasLower && senha.length > 7 && hasSpecial;
+
+        if (!valid) {
+            alert('Senha fraca\n\nAo menos 8 caracteres, uma letra minuscula, uma maiuscula, um numero e um caracter especial');
+            return;
+        }
+
+        if (senha !== confirmarSenha) {
+            alert('Senhas nao conferem')
+            return;
+        }
+
+        fetch(`/Autenticacao/AlterarSenha?usuarioSolicitacaoId=${usuarioSolicitacao.Id}&senha=${senha}`, null)
+            .then(function (res) {
+                console.log(`Sucesso: ${res}`);
+                debugger;
+
+                switch (res.status) {
+                    case 404:
+                        alert('Token expirado ou solicitação não encontrada');
+                        break;
+                    case 401:
+                        alert('Usuario/Senha não conferem com registro');
+                        break;
+                    default:
+                        alert('Sucesso');
+                        window.location = `/Autenticacao/PaginaAutenticada`;
+                        break;
+                }
+            })
+            .catch(function (res) { console.log(`Erro: ${res}`); debugger; })
+    }
+</script>
+
+<section id="novasenha">
+    <form onsubmit="enviarDados(event)" style="max-width: 35%">
+        <div class="form-group">
+            <label>Senha</label>
+            <input type="password" id="inpSenha" class="form-control" name="senha" value="" />
+        </div>
+
+        <div class="form-group">
+            <label>Confirmar senha</label>
+            <input type="password" id="inpConfirmarSenha" class="form-control" name="confirmarSenha" value="" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Confirmar</button>
+    </form>
+</section>
+
+
+

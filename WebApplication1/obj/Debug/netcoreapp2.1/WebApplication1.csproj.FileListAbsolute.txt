@@ -73,3 +73,5 @@ C:\Users\skyys\Desktop\juliaAutenticacao-master\WebApplication1\obj\Debug\netcor
 C:\Users\skyys\Desktop\juliaAutenticacao-master\WebApplication1\obj\Debug\netcoreapp2.1\WebApplication1.dll
 C:\Users\skyys\Desktop\juliaAutenticacao-master\WebApplication1\obj\Debug\netcoreapp2.1\WebApplication1.pdb
 C:\Users\skyys\Desktop\juliaAutenticacao-master\WebApplication1\obj\Debug\netcoreapp2.1\WebApplication1.csproj.CopyComplete
+C:\Users\skyys\Desktop\juliaAutenticacao-master\WebApplication1\obj\Debug\netcoreapp2.1\Razor\Views\Autenticacao\RecuperarSenha.g.cshtml.cs
+C:\Users\skyys\Desktop\juliaAutenticacao-master\WebApplication1\obj\Debug\netcoreapp2.1\Razor\Views\Autenticacao\Login.g.cshtml.cs

@@ -35,6 +35,17 @@ namespace WebApplication1.Controllers
 
         public async Task<IActionResult> CriarUsuario(string usuario, string email)
         {
+            var usuarioDuplicado = usuarioRepositorio.Get().Where(x => x.Username.ToUpper().Trim() == usuario.ToUpper().Trim()).FirstOrDefault();
+
+            if (usuarioDuplicado != null)
+                return BadRequest("Usuario duplicado");
+
+            usuarioDuplicado = usuarioRepositorio.Get().Where(x => x.Email.ToUpper().Trim() == email.ToUpper().Trim()).FirstOrDefault();
+
+            if (usuarioDuplicado != null)
+                return BadRequest("Email duplicado");
+
+
             Usuario user = new Usuario()
             {
                 Username = usuario,
@@ -45,14 +56,12 @@ namespace WebApplication1.Controllers
 
             UsuarioSolicitacao usuarioSolicitacao = new UsuarioSolicitacao()
             {
-                ExpiraEm = DateTime.Now.AddMinutes(10),
+                ExpiraEm = DateTime.Now.AddMinutes(2),
                 Usuario = user,
                 SenhaTemporaria = Guid.NewGuid().ToString().Substring(5, 8)
             };
 
             usuarioSolicitacaoRepository.Adicionar(usuarioSolicitacao);
-
-            //Falta enviar o email
 
             var sb = new StringBuilder();
             sb.AppendLine($"Olá {user.Username}");
@@ -125,6 +134,11 @@ namespace WebApplication1.Controllers
 
             senha = Encrypt256(senha);
 
+            if(user.Senha == senha)
+            {
+                return BadRequest();
+            }
+
             user.Senha = senha;
 
             usuarioRepositorio.Alterar(user);
@@ -188,12 +202,84 @@ namespace WebApplication1.Controllers
             return View();
         }
 
+        public IActionResult RecuperarSenha()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> EsqueciSenha(string email)
+        {
+            var user = usuarioRepositorio.Get().Where(x => x.Email.ToUpper().Trim() == email.ToUpper().Trim()).FirstOrDefault();
+
+            if (user == null)
+                return BadRequest();
+
+            UsuarioSolicitacao usuarioSolicitacao = new UsuarioSolicitacao()
+            {
+                ExpiraEm = DateTime.Now.AddMinutes(2),
+                Usuario = user,
+                SenhaTemporaria = Guid.NewGuid().ToString().Substring(5, 8)
+            };
+
+            usuarioSolicitacaoRepository.Adicionar(usuarioSolicitacao);
+
+            var sb = new StringBuilder();
+            sb.AppendLine($"Olá {user.Username}");
+            sb.AppendLine($"\nRealize sua recuperação de conta com a senha a seguir utilizando o link abaixo antes do tempo de expiração");
+            sb.AppendLine($"\nSenha: {usuarioSolicitacao.SenhaTemporaria}");
+            sb.AppendLine($"\nExpiração: {usuarioSolicitacao.ExpiraEm.ToString()}");
+            sb.AppendLine($"\nLink: http://localhost:53551/Autenticacao/ConfirmarLogin?usuarioSolicitacaoId={usuarioSolicitacao.Id}");
+
+            await _emailSender.SendEmailAsync(user.Email, "Recuperação de senha", sb.ToString());
+
+            return Ok();
+        }
 
 
+        public async Task<IActionResult> Login(string usuario, string senha)
+        {
+            senha = Encrypt256(senha);
 
+            var user = usuarioRepositorio.Get().Where(x => x.Username.ToUpper().Trim() == usuario.ToUpper().Trim()).FirstOrDefault();
 
+            if (user == null)
+                return BadRequest();
 
+            if (user.Senha != senha)
+                return Unauthorized();
 
+            var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role);
+
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Email));
+            identity.AddClaim(new Claim(ClaimTypes.Name, user.Username));
+            identity.AddClaim(new Claim(ClaimTypes.Role, "User"));
+
+            var principal = new ClaimsPrincipal(identity);
+
+            var authProperties = new AuthenticationProperties
+            {
+                AllowRefresh = true,
+                ExpiresUtc = DateTimeOffset.Now.AddDays(1),
+                IsPersistent = true,
+            };
+
+            try
+            {
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(principal), authProperties);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+            if (User.Identity.IsAuthenticated)
+                return Ok();
+            else
+            {
+                return Unauthorized();
+            }
+        }
 
 
         private const string AesIV256 = @"!QAZ2WSX#EDC4RFV";

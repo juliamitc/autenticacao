@@ -1,38 +1,27 @@
 ﻿@{
-    ViewData["Title"] = "Registrar";
+    ViewData["Title"] = "Esqueci minha senha";
 }
 
 
-<h1>Registrar</h1>
+<h1>Esqueci minha senha</h1>
 
 <script type="text/javascript">
     function enviarDados(event) {
         event.preventDefault();
 
-        //let user = {
-        //    Username: document.getElementById('inpUsuario').value,
-        //    Email: document.getElementById('inpEmail').value
-        //}
-
-        let usuario = document.getElementById('inpUsuario').value;
         let email = document.getElementById('inpEmail').value;
-
-        if (!usuario) {
-            alert('preencher usuario')
-            return;
-        }
 
         if (!email) {
             alert('preencher email')
             return;
         }
 
-        fetch(`/Autenticacao/CriarUsuario?usuario=${usuario}&email=${email}`, null)
+        fetch(`/Autenticacao/EsqueciSenha?email=${email}`, null)
             .then(function (res) {
 
                 switch (res.status) {
                     case 400:
-                        alert('Usuario/email duplicados');
+                        alert('Email nao encontrado');
                         break;
                     default:
                         alert('Sucesso\nVerifique seu e-mail.')
@@ -46,18 +35,10 @@
 <section id="registrar">
     <form onsubmit="enviarDados(event)" style="max-width: 35%">
         <div class="form-group">
-            <label>Usuario</label>
-            <input type="text" id="inpUsuario" class="form-control" name="usuario" value="" />
-        </div>
-
-        <div class="form-group">
             <label>Email</label>
             <input type="email" id="inpEmail" class="form-control" name="email" value="" />
         </div>
-
-        <a href="/Autenticacao/RecuperarSenha">Esqueci minha senha</a><br /><br />
-
-        <button type="submit" class="btn btn-success">Registrar</button>
+        <button type="submit" class="btn btn-success">Enviar</button>
     </form>
 </section>
 

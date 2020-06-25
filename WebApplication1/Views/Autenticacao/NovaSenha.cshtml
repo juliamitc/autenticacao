@@ -37,6 +37,9 @@
                 debugger;
 
                 switch (res.status) {
+                    case 400:
+                        alert('Senha já utilizada!')
+                        break;
                     case 404:
                         alert('Token expirado ou solicitação não encontrada');
                         break;

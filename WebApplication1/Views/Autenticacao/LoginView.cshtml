@@ -1,7 +1,61 @@
-﻿
-@{
-    ViewData["Title"] = "LoginView";
-}
+﻿<h1>Login</h1>
 
-<h2>LoginView</h2>
+<script type="text/javascript">
+    function enviarDados(event) {
+        event.preventDefault();
+
+        //let user = {
+        //    Username: document.getElementById('inpUsuario').value,
+        //    Email: document.getElementById('inpEmail').value
+        //}
+
+        let usuario = document.getElementById('inpUsuario').value;
+        let senha = document.getElementById('inpSenha').value;
+
+        if (!usuario) {
+            alert('preencher usuario')
+            return;
+        }
+
+        if (!senha) {
+            alert('preencher senha')
+            return;
+        }
+
+        fetch(`/Autenticacao/Login?usuario=${usuario}&senha=${senha}`, null)
+            .then(function (res) {
+
+                switch (res.status) {
+                    case 400:
+                        alert('Conta nao encontrada');
+                        break;
+                    case 401:
+                        alert('Senha incorreta')
+                        break;
+                    default:
+                        window.location = `/Autenticacao/PaginaAutenticada`;
+                        break;
+                }
+            })
+            .catch(function (res) { console.log(`Erro: ${res}`) })
+    }
+</script>
+
+<section id="login">
+    <form onsubmit="enviarDados(event)" style="max-width: 35%">
+        <div class="form-group">
+            <label>Usuario</label>
+            <input type="text" id="inpUsuario" class="form-control" name="usuario" value="" />
+        </div>
+
+        <div class="form-group">
+            <label>Senha</label>
+            <input type="password" id="inpSenha" class="form-control" name="senha" value="" />
+        </div>
+
+        <a href="/Autenticacao/RecuperarSenha">Esqueci minha senha</a><br /><br />
+
+        <button type="submit" class="btn btn-success">Entrar</button>
+    </form>
+</section>
 

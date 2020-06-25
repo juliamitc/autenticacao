@@ -1,9 +1,4 @@
-﻿@{
-    ViewData["Title"] = "Registrar";
-}
-
-
-<h1>Registrar</h1>
+﻿<h1>Login</h1>
 
 <script type="text/javascript">
     function enviarDados(event) {
@@ -15,7 +10,7 @@
         //}
 
         let usuario = document.getElementById('inpUsuario').value;
-        let email = document.getElementById('inpEmail').value;
+        let email = document.getElementById('inpSenha').value;
 
         if (!usuario) {
             alert('preencher usuario')
@@ -23,19 +18,22 @@
         }
 
         if (!email) {
-            alert('preencher email')
+            alert('preencher senha')
             return;
         }
 
-        fetch(`/Autenticacao/CriarUsuario?usuario=${usuario}&email=${email}`, null)
+        fetch(`/Autenticacao/Login?usuario=${usuario}&senha=${senha}`, null)
             .then(function (res) {
 
                 switch (res.status) {
                     case 400:
-                        alert('Usuario/email duplicados');
+                        alert('Conta nao encontrada');
+                        break;
+                    case 401:
+                        alert('Senha incorreta')
                         break;
                     default:
-                        alert('Sucesso\nVerifique seu e-mail.')
+                        window.location = `/Autenticacao/PaginaAutenticada`;
                         break;
                 }
             })
@@ -43,7 +41,7 @@
     }
 </script>
 
-<section id="registrar">
+<section id="login">
     <form onsubmit="enviarDados(event)" style="max-width: 35%">
         <div class="form-group">
             <label>Usuario</label>
@@ -51,13 +49,13 @@
         </div>
 
         <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="inpEmail" class="form-control" name="email" value="" />
+            <label>Senha</label>
+            <input type="password" id="inpSenha" class="form-control" name="senha" value="" />
         </div>
 
         <a href="/Autenticacao/RecuperarSenha">Esqueci minha senha</a><br /><br />
 
-        <button type="submit" class="btn btn-success">Registrar</button>
+        <button type="submit" class="btn btn-success">Entrar</button>
     </form>
 </section>
 
